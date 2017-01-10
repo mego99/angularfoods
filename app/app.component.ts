@@ -1,22 +1,9 @@
 import { Component } from '@angular/core';
+import { OnInit } from '@angular/core';
 
-export class Food {
-  id: number;
-  name: string;
-}
+import { Food } from './food';
 
-const FOODS: Food[] = [
-  { id: 11, name: 'pasta' },
-  { id: 12, name: 'pizza' },
-  { id: 13, name: 'lemons' },
-  { id: 14, name: 'salad' },
-  { id: 15, name: 'soda' },
-  { id: 16, name: 'water' },
-  { id: 17, name: 'pie' },
-  { id: 18, name: 'ice cream' },
-  { id: 19, name: 'candy' },
-  { id: 20, name: 'waffles' }
-];
+import { FoodService } from './food.service';
 
 @Component({
   selector: 'my-app',
@@ -24,21 +11,14 @@ const FOODS: Food[] = [
   <h1>{{title}}</h1>
   <h2>My foods</h2>
   <ul class="heroes">
-    <li
-    *ngFor="let food of foods"
+    <li *ngFor="let food of foods"
     (click)="onSelect(food)"
-    [class.selected] = "food === selectedFood" > 
+    [class.selected] = "food === selectedFood" >
       <span class="badge">{{food.id}}</span> {{food.name}}
     </li>
   </ul>
-  <div *ngIf="selectedFood">
-    <h2>{{selectedFood.name}} details!</h2>
-    <div><label>id: </label>{{selectedFood.id}}</div>
-    <div>
-      <label>name: </label>
-      <input [(ngModel)]="selectedFood.name" placeholder="name"/>
-    </div>
-  </div>
+
+  <my-food-detail [food]="selectedFood"></my-food-detail>
   `,
   styles: [`
   .selected {
@@ -88,14 +68,27 @@ const FOODS: Food[] = [
     margin-right: .8em;
     border-radius: 4px 0 0 4px;
   }
-  `]
+  `],
+  providers: [FoodService]
 })
 
-export class AppComponent  {
+export class AppComponent implements OnInit {
   title = 'The Pantry';
-  foods = FOODS;
+  // foods = FOODS;
+  foods: Food[];
   selectedFood: Food;
+
   onSelect(food: Food): void {
     this.selectedFood = food;
+  }
+
+  constructor(private foodService: FoodService) { }
+
+  getFoods(): void {
+    this.foodService.getFoods().then(foods => this.foods = foods);
+  }
+
+  ngOnInit(): void {
+    this.getFoods();
   }
 }
